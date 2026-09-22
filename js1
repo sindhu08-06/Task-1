@@ -1,0 +1,60 @@
+const internshipData = [
+    { id: 1, title: "Frontend Developer Intern", company: "TechCorp", domain: "tech", location: "Remote" },
+    { id: 2, title: "UI/UX Product Designer", company: "CreativeStudio", domain: "design", location: "New York, NY" },
+    { id: 3, title: "Growth Marketing Intern", company: "ScaleUp", domain: "marketing", location: "Hybrid" },
+    { id: 4, title: "Backend Engineer (Node.js)", company: "DataFlow", domain: "tech", location: "Remote" }
+];
+
+const container = document.getElementById('internships-container');
+const statusMessage = document.getElementById('status-message');
+const searchInput = document.getElementById('search-input');
+const domainSelect = document.getElementById('domain-select');
+
+function renderCards(internships) {
+    container.innerHTML = '';
+    statusMessage.className = 'hidden';
+    
+    if (internships.length === 0) {
+        statusMessage.textContent = '❌ No internships match your search criteria.';
+        statusMessage.className = 'empty-state';
+        return;
+    }
+
+    internships.forEach(item => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.innerHTML = `
+            <h2><a href="#" aria-describedby="desc-${item.id}">${item.title}</a></h2>
+            <p id="desc-${item.id}"><strong>${item.company}</strong> — ${item.location}</p>
+            <span class="badge">${item.domain.toUpperCase()}</span>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function filterData() {
+    try {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const selectedDomain = domainSelect.value;
+
+        const filtered = internshipData.filter(item => {
+            const matchesSearch = item.title.toLowerCase().includes(searchTerm) || 
+                                  item.company.toLowerCase().includes(searchTerm);
+            const matchesDomain = selectedDomain === 'all' || item.domain === selectedDomain;
+            
+            return matchesSearch && matchesDomain;
+        });
+
+        renderCards(filtered);
+    } catch (error) {
+        statusMessage.textContent = '⚠️ An error occurred while retrieving data. Please refresh.';
+        statusMessage.className = 'error-state';
+    }
+}
+
+searchInput.addEventListener('input', filterData);
+domainSelect.addEventListener('change', filterData);
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderCards(internshipData);
+});
